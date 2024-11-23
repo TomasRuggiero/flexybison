@@ -1,6 +1,7 @@
 %{
+#include <string.h>
 #include "micro.tab.h"
-int yywrap() { return 1; }  // Finaliza el análisis léxico cuando se termina el archivo
+int yywrap(void) { return 1; }  // Finaliza el análisis léxico cuando se termina el archivo
 %}
 
 DIGITO          [0-9]
