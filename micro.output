@@ -1,0 +1,399 @@
+State 17 conflicts: 2 reduce/reduce
+
+
+Grammar
+
+    0 $accept: programa $end
+
+    1 programa: PALABRA_RESERVADA cuerpo PALABRA_RESERVADA
+
+    2 cuerpo: /* empty */
+    3       | cuerpo sentencia
+
+    4 sentencia: asignacion
+    5          | entrada_salida
+
+    6 asignacion: IDENTIFICADOR ASIGNACION expresion PUNTOYCOMA
+
+    7 entrada_salida: PALABRA_RESERVADA PARENIZQ lista_ids PARENDER PUNTOYCOMA
+    8               | PALABRA_RESERVADA PARENIZQ lista_expresiones PARENDER PUNTOYCOMA
+
+    9 lista_ids: IDENTIFICADOR
+   10          | lista_ids COMA IDENTIFICADOR
+
+   11 lista_expresiones: expresion
+   12                  | lista_expresiones COMA expresion
+
+   13 expresion: termino
+   14          | expresion SUMA termino
+   15          | expresion RESTA termino
+
+   16 termino: CONSTANTE
+   17        | IDENTIFICADOR
+   18        | PARENIZQ expresion PARENDER
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+IDENTIFICADOR (258) 6 9 10 17
+CONSTANTE (259) 16
+PALABRA_RESERVADA (260) 1 7 8
+ASIGNACION (261) 6
+PUNTOYCOMA (262) 6 7 8
+COMA (263) 10 12
+PARENIZQ (264) 7 8 18
+PARENDER (265) 7 8 18
+SUMA (266) 14
+RESTA (267) 15
+
+
+Nonterminals, with rules where they appear
+
+$accept (13)
+    on left: 0
+programa (14)
+    on left: 1, on right: 0
+cuerpo (15)
+    on left: 2 3, on right: 1 3
+sentencia (16)
+    on left: 4 5, on right: 3
+asignacion (17)
+    on left: 6, on right: 4
+entrada_salida (18)
+    on left: 7 8, on right: 5
+lista_ids (19)
+    on left: 9 10, on right: 7 10
+lista_expresiones (20)
+    on left: 11 12, on right: 8 12
+expresion (21)
+    on left: 13 14 15, on right: 6 11 12 14 15 18
+termino (22)
+    on left: 16 17 18, on right: 13 14 15
+
+
+state 0
+
+    0 $accept: . programa $end
+
+    PALABRA_RESERVADA  shift, and go to state 1
+
+    programa  go to state 2
+
+
+state 1
+
+    1 programa: PALABRA_RESERVADA . cuerpo PALABRA_RESERVADA
+
+    $default  reduce using rule 2 (cuerpo)
+
+    cuerpo  go to state 3
+
+
+state 2
+
+    0 $accept: programa . $end
+
+    $end  shift, and go to state 4
+
+
+state 3
+
+    1 programa: PALABRA_RESERVADA cuerpo . PALABRA_RESERVADA
+    3 cuerpo: cuerpo . sentencia
+
+    IDENTIFICADOR      shift, and go to state 5
+    PALABRA_RESERVADA  shift, and go to state 6
+
+    sentencia       go to state 7
+    asignacion      go to state 8
+    entrada_salida  go to state 9
+
+
+state 4
+
+    0 $accept: programa $end .
+
+    $default  accept
+
+
+state 5
+
+    6 asignacion: IDENTIFICADOR . ASIGNACION expresion PUNTOYCOMA
+
+    ASIGNACION  shift, and go to state 10
+
+
+state 6
+
+    1 programa: PALABRA_RESERVADA cuerpo PALABRA_RESERVADA .
+    7 entrada_salida: PALABRA_RESERVADA . PARENIZQ lista_ids PARENDER PUNTOYCOMA
+    8               | PALABRA_RESERVADA . PARENIZQ lista_expresiones PARENDER PUNTOYCOMA
+
+    PARENIZQ  shift, and go to state 11
+
+    $default  reduce using rule 1 (programa)
+
+
+state 7
+
+    3 cuerpo: cuerpo sentencia .
+
+    $default  reduce using rule 3 (cuerpo)
+
+
+state 8
+
+    4 sentencia: asignacion .
+
+    $default  reduce using rule 4 (sentencia)
+
+
+state 9
+
+    5 sentencia: entrada_salida .
+
+    $default  reduce using rule 5 (sentencia)
+
+
+state 10
+
+    6 asignacion: IDENTIFICADOR ASIGNACION . expresion PUNTOYCOMA
+
+    IDENTIFICADOR  shift, and go to state 12
+    CONSTANTE      shift, and go to state 13
+    PARENIZQ       shift, and go to state 14
+
+    expresion  go to state 15
+    termino    go to state 16
+
+
+state 11
+
+    7 entrada_salida: PALABRA_RESERVADA PARENIZQ . lista_ids PARENDER PUNTOYCOMA
+    8               | PALABRA_RESERVADA PARENIZQ . lista_expresiones PARENDER PUNTOYCOMA
+
+    IDENTIFICADOR  shift, and go to state 17
+    CONSTANTE      shift, and go to state 13
+    PARENIZQ       shift, and go to state 14
+
+    lista_ids          go to state 18
+    lista_expresiones  go to state 19
+    expresion          go to state 20
+    termino            go to state 16
+
+
+state 12
+
+   17 termino: IDENTIFICADOR .
+
+    $default  reduce using rule 17 (termino)
+
+
+state 13
+
+   16 termino: CONSTANTE .
+
+    $default  reduce using rule 16 (termino)
+
+
+state 14
+
+   18 termino: PARENIZQ . expresion PARENDER
+
+    IDENTIFICADOR  shift, and go to state 12
+    CONSTANTE      shift, and go to state 13
+    PARENIZQ       shift, and go to state 14
+
+    expresion  go to state 21
+    termino    go to state 16
+
+
+state 15
+
+    6 asignacion: IDENTIFICADOR ASIGNACION expresion . PUNTOYCOMA
+   14 expresion: expresion . SUMA termino
+   15          | expresion . RESTA termino
+
+    PUNTOYCOMA  shift, and go to state 22
+    SUMA        shift, and go to state 23
+    RESTA       shift, and go to state 24
+
+
+state 16
+
+   13 expresion: termino .
+
+    $default  reduce using rule 13 (expresion)
+
+
+state 17
+
+    9 lista_ids: IDENTIFICADOR .
+   17 termino: IDENTIFICADOR .
+
+    COMA      reduce using rule 9 (lista_ids)
+    COMA      [reduce using rule 17 (termino)]
+    PARENDER  reduce using rule 9 (lista_ids)
+    PARENDER  [reduce using rule 17 (termino)]
+    SUMA      reduce using rule 17 (termino)
+    RESTA     reduce using rule 17 (termino)
+    $default  reduce using rule 9 (lista_ids)
+
+
+state 18
+
+    7 entrada_salida: PALABRA_RESERVADA PARENIZQ lista_ids . PARENDER PUNTOYCOMA
+   10 lista_ids: lista_ids . COMA IDENTIFICADOR
+
+    COMA      shift, and go to state 25
+    PARENDER  shift, and go to state 26
+
+
+state 19
+
+    8 entrada_salida: PALABRA_RESERVADA PARENIZQ lista_expresiones . PARENDER PUNTOYCOMA
+   12 lista_expresiones: lista_expresiones . COMA expresion
+
+    COMA      shift, and go to state 27
+    PARENDER  shift, and go to state 28
+
+
+state 20
+
+   11 lista_expresiones: expresion .
+   14 expresion: expresion . SUMA termino
+   15          | expresion . RESTA termino
+
+    SUMA   shift, and go to state 23
+    RESTA  shift, and go to state 24
+
+    $default  reduce using rule 11 (lista_expresiones)
+
+
+state 21
+
+   14 expresion: expresion . SUMA termino
+   15          | expresion . RESTA termino
+   18 termino: PARENIZQ expresion . PARENDER
+
+    PARENDER  shift, and go to state 29
+    SUMA      shift, and go to state 23
+    RESTA     shift, and go to state 24
+
+
+state 22
+
+    6 asignacion: IDENTIFICADOR ASIGNACION expresion PUNTOYCOMA .
+
+    $default  reduce using rule 6 (asignacion)
+
+
+state 23
+
+   14 expresion: expresion SUMA . termino
+
+    IDENTIFICADOR  shift, and go to state 12
+    CONSTANTE      shift, and go to state 13
+    PARENIZQ       shift, and go to state 14
+
+    termino  go to state 30
+
+
+state 24
+
+   15 expresion: expresion RESTA . termino
+
+    IDENTIFICADOR  shift, and go to state 12
+    CONSTANTE      shift, and go to state 13
+    PARENIZQ       shift, and go to state 14
+
+    termino  go to state 31
+
+
+state 25
+
+   10 lista_ids: lista_ids COMA . IDENTIFICADOR
+
+    IDENTIFICADOR  shift, and go to state 32
+
+
+state 26
+
+    7 entrada_salida: PALABRA_RESERVADA PARENIZQ lista_ids PARENDER . PUNTOYCOMA
+
+    PUNTOYCOMA  shift, and go to state 33
+
+
+state 27
+
+   12 lista_expresiones: lista_expresiones COMA . expresion
+
+    IDENTIFICADOR  shift, and go to state 12
+    CONSTANTE      shift, and go to state 13
+    PARENIZQ       shift, and go to state 14
+
+    expresion  go to state 34
+    termino    go to state 16
+
+
+state 28
+
+    8 entrada_salida: PALABRA_RESERVADA PARENIZQ lista_expresiones PARENDER . PUNTOYCOMA
+
+    PUNTOYCOMA  shift, and go to state 35
+
+
+state 29
+
+   18 termino: PARENIZQ expresion PARENDER .
+
+    $default  reduce using rule 18 (termino)
+
+
+state 30
+
+   14 expresion: expresion SUMA termino .
+
+    $default  reduce using rule 14 (expresion)
+
+
+state 31
+
+   15 expresion: expresion RESTA termino .
+
+    $default  reduce using rule 15 (expresion)
+
+
+state 32
+
+   10 lista_ids: lista_ids COMA IDENTIFICADOR .
+
+    $default  reduce using rule 10 (lista_ids)
+
+
+state 33
+
+    7 entrada_salida: PALABRA_RESERVADA PARENIZQ lista_ids PARENDER PUNTOYCOMA .
+
+    $default  reduce using rule 7 (entrada_salida)
+
+
+state 34
+
+   12 lista_expresiones: lista_expresiones COMA expresion .
+   14 expresion: expresion . SUMA termino
+   15          | expresion . RESTA termino
+
+    SUMA   shift, and go to state 23
+    RESTA  shift, and go to state 24
+
+    $default  reduce using rule 12 (lista_expresiones)
+
+
+state 35
+
+    8 entrada_salida: PALABRA_RESERVADA PARENIZQ lista_expresiones PARENDER PUNTOYCOMA .
+
+    $default  reduce using rule 8 (entrada_salida)
