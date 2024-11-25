@@ -1,6 +1,6 @@
 #include <stdio.h>
 extern int yyparse();
-extern void init_symbol_table();
+extern void init_tabla_simbolos();
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    init_symbol_table();
+    init_tabla_simbolos();
 
     if (yyparse() == 0) {
         printf("El programa es válido.\n");

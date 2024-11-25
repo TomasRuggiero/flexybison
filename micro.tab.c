@@ -108,65 +108,65 @@
 int yylex();
 void yyerror(const char *s) { fprintf(stderr, "Error: %s\n", s); }
 
-typedef struct Symbol {
-    char *symbol;
-    int isUsed;
-} Symbol;
+typedef struct Simbolo {
+    char *simbolo;
+    int es_usada;
+} Simbolo;
 
-typedef struct SymbolTable {
-    Symbol *symbols;
-    int size;
-    int capacity;
-} SymbolTable;
+typedef struct TablaSimbolos {
+    Simbolo *simbolos;
+    int tamanio;
+    int capacidad;
+} TablaSimbolos;
 
-SymbolTable *symbol_table;
+TablaSimbolos *tabla_simbolos;
 
-void init_symbol_table() {
-    symbol_table = malloc(sizeof(SymbolTable));
-    symbol_table->size = 0;
-    symbol_table->capacity = 10;
-    symbol_table->symbols = malloc(symbol_table->capacity * sizeof(Symbol));
+void init_tabla_simbolos() {
+    tabla_simbolos = malloc(sizeof(TablaSimbolos));
+    tabla_simbolos->tamanio = 0;
+    tabla_simbolos->capacidad = 10;
+    tabla_simbolos->simbolos = malloc(tabla_simbolos->capacidad * sizeof(Simbolo));
 }
 
-void add_symbol(char *symbol) {
-    if (symbol_table->size == symbol_table->capacity) {
-        symbol_table->capacity *= 2;
-        symbol_table->symbols = realloc(symbol_table->symbols, symbol_table->capacity * sizeof(Symbol));
+void agregar_simbolo(char *simbolo) {
+    if (tabla_simbolos->tamanio == tabla_simbolos->capacidad) {
+        tabla_simbolos->capacidad *= 2;
+        tabla_simbolos->simbolos = realloc(tabla_simbolos->simbolos, tabla_simbolos->capacidad * sizeof(Simbolo));
     }
-    symbol_table->symbols[symbol_table->size++].symbol = strdup(symbol);
-    symbol_table->symbols[symbol_table->size].isUsed = 0;
+    tabla_simbolos->simbolos[tabla_simbolos->tamanio++].simbolo = strdup(simbolo);
+    tabla_simbolos->simbolos[tabla_simbolos->tamanio].es_usada = 0;
 }
 
-int symbol_exists(char *symbol) {
-    for (int i = 0; i < symbol_table->size; i++) {
-        if (strcmp(symbol_table->symbols[i].symbol, symbol) == 0) {
+int existe_simbolo(char *simbolo) {
+    for (int i = 0; i < tabla_simbolos->tamanio; i++) {
+        if (strcmp(tabla_simbolos->simbolos[i].simbolo, simbolo) == 0) {
             return 1;
         }
     }
     return 0;
 }
 
-void use_symbol(char* symbol) {
-    for (int i = 0; i < symbol_table->size; i++) {
-        if (strcmp(symbol_table->symbols[i].symbol, symbol) == 0) {
-            symbol_table->symbols[i].isUsed = 1;
+void use_symbol(char* simbolo) {
+    for (int i = 0; i < tabla_simbolos->tamanio; i++) {
+        if (strcmp(tabla_simbolos->simbolos[i].simbolo, simbolo) == 0) {
+            tabla_simbolos->simbolos[i].es_usada = 1;
         }
     }
 }
 
-void check_unused_variables() {
-    for (int i = 0; i < symbol_table->size; i++) {
-        if (symbol_table->symbols[i].isUsed == 0)
-            printf("Warning: La variable %s es declarada pero no se utiliza\n", symbol_table->symbols[i].symbol);
+void verificar_vars_no_usadas() {
+    for (int i = 0; i < tabla_simbolos->tamanio; i++) {
+        if (tabla_simbolos->simbolos[i].es_usada == 0)
+            printf("Warning: La variable %s es declarada pero no se utiliza\n", tabla_simbolos->simbolos[i].simbolo);
     }
 }
 
-void free_symbol_table() {
-    for (int i = 0; i < symbol_table->size; i++) {
-        free(symbol_table->symbols[i].symbol);
+void free_tabla_simbolos() {
+    for (int i = 0; i < tabla_simbolos->tamanio; i++) {
+        free(tabla_simbolos->simbolos[i].simbolo);
     }
-    free(symbol_table->symbols);
-    free(symbol_table);
+    free(tabla_simbolos->simbolos);
+    free(tabla_simbolos);
 }
 
 
@@ -501,7 +501,7 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    83,    83,    91,    93,    97,    98,   102,   111,   112,
-     116,   122,   132,   133,   137,   138,   139,   143,   144,   151
+     116,   122,   131,   132,   136,   137,   138,   142,   143,   149
 };
 #endif
 
@@ -1422,8 +1422,8 @@ yyreduce:
 #line 83 "micro.y"
     {
         printf("Fin del programa.\n");
-        check_unused_variables();
-        free_symbol_table();
+        verificar_vars_no_usadas();
+        free_tabla_simbolos();
         exit(0);
     ;}
     break;
@@ -1431,8 +1431,8 @@ yyreduce:
   case 7:
 #line 102 "micro.y"
     {
-        if (!symbol_exists((yyvsp[(1) - (4)].sval))) {
-            add_symbol((yyvsp[(1) - (4)].sval));  // Si no está en la tabla, agrégalo
+        if (!existe_simbolo((yyvsp[(1) - (4)].sval))) {
+            agregar_simbolo((yyvsp[(1) - (4)].sval));
             printf("Declarando identificador: %s\n", (yyvsp[(1) - (4)].sval));
         }
     ;}
@@ -1441,8 +1441,8 @@ yyreduce:
   case 10:
 #line 116 "micro.y"
     {
-        if (!symbol_exists((yyvsp[(1) - (1)].sval))) {
-            add_symbol((yyvsp[(1) - (1)].sval));
+        if (!existe_simbolo((yyvsp[(1) - (1)].sval))) {
+            agregar_simbolo((yyvsp[(1) - (1)].sval));
             printf("Declarando identificador: %s\n", (yyvsp[(1) - (1)].sval));
         }
     ;}
@@ -1451,20 +1451,18 @@ yyreduce:
   case 11:
 #line 122 "micro.y"
     {
-        printf("%s\n", (yyvsp[(3) - (3)].sval));
-        if (!symbol_exists((yyvsp[(3) - (3)].sval))) {
-            add_symbol((yyvsp[(3) - (3)].sval));
+        if (!existe_simbolo((yyvsp[(3) - (3)].sval))) {
+            agregar_simbolo((yyvsp[(3) - (3)].sval));
             printf("Declarando identificador: %s\n", (yyvsp[(3) - (3)].sval));
         }
     ;}
     break;
 
   case 18:
-#line 144 "micro.y"
+#line 143 "micro.y"
     {
-        if (!symbol_exists((yyvsp[(1) - (1)].sval))) {
+        if (!existe_simbolo((yyvsp[(1) - (1)].sval))) {
             fprintf(stderr, "Error: El identificador '%s' no está declarado.\n", (yyvsp[(1) - (1)].sval));
-            exit(1);  // Termina con error
         }
         use_symbol((yyvsp[(1) - (1)].sval));
     ;}
@@ -1472,7 +1470,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1476 "micro.tab.c"
+#line 1474 "micro.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1686,5 +1684,5 @@ yyreturn:
 }
 
 
-#line 154 "micro.y"
+#line 152 "micro.y"
 

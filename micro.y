@@ -5,65 +5,65 @@
 int yylex();
 void yyerror(const char *s) { fprintf(stderr, "Error: %s\n", s); }
 
-typedef struct Symbol {
-    char *symbol;
-    int isUsed;
-} Symbol;
+typedef struct Simbolo {
+    char *simbolo;
+    int es_usada;
+} Simbolo;
 
-typedef struct SymbolTable {
-    Symbol *symbols;
-    int size;
-    int capacity;
-} SymbolTable;
+typedef struct TablaSimbolos {
+    Simbolo *simbolos;
+    int tamanio;
+    int capacidad;
+} TablaSimbolos;
 
-SymbolTable *symbol_table;
+TablaSimbolos *tabla_simbolos;
 
-void init_symbol_table() {
-    symbol_table = malloc(sizeof(SymbolTable));
-    symbol_table->size = 0;
-    symbol_table->capacity = 10;
-    symbol_table->symbols = malloc(symbol_table->capacity * sizeof(Symbol));
+void init_tabla_simbolos() {
+    tabla_simbolos = malloc(sizeof(TablaSimbolos));
+    tabla_simbolos->tamanio = 0;
+    tabla_simbolos->capacidad = 10;
+    tabla_simbolos->simbolos = malloc(tabla_simbolos->capacidad * sizeof(Simbolo));
 }
 
-void add_symbol(char *symbol) {
-    if (symbol_table->size == symbol_table->capacity) {
-        symbol_table->capacity *= 2;
-        symbol_table->symbols = realloc(symbol_table->symbols, symbol_table->capacity * sizeof(Symbol));
+void agregar_simbolo(char *simbolo) {
+    if (tabla_simbolos->tamanio == tabla_simbolos->capacidad) {
+        tabla_simbolos->capacidad *= 2;
+        tabla_simbolos->simbolos = realloc(tabla_simbolos->simbolos, tabla_simbolos->capacidad * sizeof(Simbolo));
     }
-    symbol_table->symbols[symbol_table->size++].symbol = strdup(symbol);
-    symbol_table->symbols[symbol_table->size].isUsed = 0;
+    tabla_simbolos->simbolos[tabla_simbolos->tamanio++].simbolo = strdup(simbolo);
+    tabla_simbolos->simbolos[tabla_simbolos->tamanio].es_usada = 0;
 }
 
-int symbol_exists(char *symbol) {
-    for (int i = 0; i < symbol_table->size; i++) {
-        if (strcmp(symbol_table->symbols[i].symbol, symbol) == 0) {
+int existe_simbolo(char *simbolo) {
+    for (int i = 0; i < tabla_simbolos->tamanio; i++) {
+        if (strcmp(tabla_simbolos->simbolos[i].simbolo, simbolo) == 0) {
             return 1;
         }
     }
     return 0;
 }
 
-void use_symbol(char* symbol) {
-    for (int i = 0; i < symbol_table->size; i++) {
-        if (strcmp(symbol_table->symbols[i].symbol, symbol) == 0) {
-            symbol_table->symbols[i].isUsed = 1;
+void use_symbol(char* simbolo) {
+    for (int i = 0; i < tabla_simbolos->tamanio; i++) {
+        if (strcmp(tabla_simbolos->simbolos[i].simbolo, simbolo) == 0) {
+            tabla_simbolos->simbolos[i].es_usada = 1;
         }
     }
 }
 
-void check_unused_variables() {
-    for (int i = 0; i < symbol_table->size; i++) {
-        if (symbol_table->symbols[i].isUsed == 0)
-            printf("Warning: La variable %s es declarada pero no se utiliza\n", symbol_table->symbols[i].symbol);
+void verificar_vars_no_usadas() {
+    for (int i = 0; i < tabla_simbolos->tamanio; i++) {
+        if (tabla_simbolos->simbolos[i].es_usada == 0)
+            printf("Warning: La variable %s es declarada pero no se utiliza\n", tabla_simbolos->simbolos[i].simbolo);
     }
 }
 
-void free_symbol_table() {
-    for (int i = 0; i < symbol_table->size; i++) {
-        free(symbol_table->symbols[i].symbol);
+void free_tabla_simbolos() {
+    for (int i = 0; i < tabla_simbolos->tamanio; i++) {
+        free(tabla_simbolos->simbolos[i].simbolo);
     }
-    free(symbol_table->symbols);
-    free(symbol_table);
+    free(tabla_simbolos->simbolos);
+    free(tabla_simbolos);
 }
 %}
 
@@ -82,8 +82,8 @@ void free_symbol_table() {
 programa:
     INICIO cuerpo FIN {
         printf("Fin del programa.\n");
-        check_unused_variables();
-        free_symbol_table();
+        verificar_vars_no_usadas();
+        free_tabla_simbolos();
         exit(0);
     }
     ;
@@ -100,8 +100,8 @@ sentencia:
 
 asignacion:
     IDENTIFICADOR ASIGNACION expresion PUNTOYCOMA {
-        if (!symbol_exists($1)) {
-            add_symbol($1);  // Si no está en la tabla, agrégalo
+        if (!existe_simbolo($1)) {
+            agregar_simbolo($1);
             printf("Declarando identificador: %s\n", $1);
         }
     }
@@ -114,14 +114,14 @@ entrada_salida:
 
 lista_ids:
     IDENTIFICADOR {
-        if (!symbol_exists($1)) {
-            add_symbol($1);
+        if (!existe_simbolo($1)) {
+            agregar_simbolo($1);
             printf("Declarando identificador: %s\n", $1);
         }
     }
     | lista_ids COMA IDENTIFICADOR {
-        if (!symbol_exists($3)) {
-            add_symbol($3);
+        if (!existe_simbolo($3)) {
+            agregar_simbolo($3);
             printf("Declarando identificador: %s\n", $3);
         }
     }
@@ -141,9 +141,8 @@ expresion:
 termino:
     CONSTANTE
     | IDENTIFICADOR {
-        if (!symbol_exists($1)) {
+        if (!existe_simbolo($1)) {
             fprintf(stderr, "Error: El identificador '%s' no está declarado.\n", $1);
-            exit(1);  // Termina con error
         }
         use_symbol($1);
     }
